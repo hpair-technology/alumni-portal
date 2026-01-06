@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alumni Portal</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="layout">
+    <header class="card">
+      <h1>Alumni Portal</h1>
+      <p>Register or log in with an approved alumni email.</p>
+    </header>
+
+    <section id="auth-section" class="card grid">
+      <div>
+        <h2>Create Account</h2>
+        <form id="register-form" class="form">
+          <label>
+            Email
+            <input id="register-email" type="email" required autocomplete="email">
+          </label>
+          <label>
+            Password
+            <input id="register-password" type="password" required minlength="6" autocomplete="new-password">
+          </label>
+          <button type="submit">Register</button>
+          <p class="hint">Only emails in alumni_portal.csv are allowed.</p>
+        </form>
+      </div>
+
+      <div>
+        <h2>Log In</h2>
+        <form id="login-form" class="form">
+          <label>
+            Email
+            <input id="login-email" type="email" required autocomplete="email">
+          </label>
+          <label>
+            Password
+            <input id="login-password" type="password" required autocomplete="current-password">
+          </label>
+          <button type="submit">Log In</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="user-section" class="card hidden">
+      <div class="user-header">
+        <div>
+          <p class="muted">Signed in as</p>
+          <p id="user-email" class="user-email"></p>
+        </div>
+        <div class="actions">
+          <button id="logout-btn" type="button" class="secondary">Sign Out</button>
+        </div>
+      </div>
+
+     
+
+      <div class="table-wrapper">
+        <div class="table-head">
+          <h3>All registered users</h3>
+          <p class="muted small">List of every account that has been created.</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody id="registered-body">
+            <tr>
+              <td class="muted">Loading…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="messages" class="card hidden"></section>
+  </main>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
+
