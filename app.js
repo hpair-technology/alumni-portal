@@ -57,6 +57,19 @@ const profileModal = document.getElementById("profile-modal");
 const closeProfileModalBtn = document.getElementById("close-profile-modal");
 const messageErrorClasses = ["border-rose-700", "text-rose-700", "bg-rose-50"];
 const messageOkClasses = ["border-rose-400", "text-slate-700", "bg-white"];
+const defaultHeadshotSvg = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+    <rect width="200" height="200" fill="#f1f5f9"/>
+    <circle cx="100" cy="80" r="40" fill="#cbd5f5"/>
+    <circle cx="100" cy="170" r="70" fill="#cbd5f5"/>
+  </svg>
+`;
+const defaultHeadshotUrl = `data:image/svg+xml;utf8,${encodeURIComponent(defaultHeadshotSvg)}`;
+const userHeadshotEl = document.getElementById("user-headshot");
+const detailHeadshotEl = document.getElementById("detail-headshot");
+
+if (userHeadshotEl) userHeadshotEl.src = defaultHeadshotUrl;
+if (detailHeadshotEl) detailHeadshotEl.src = defaultHeadshotUrl;
 
 if (otherCheckbox && otherText) {
   otherCheckbox.addEventListener("change", () => {
@@ -128,7 +141,7 @@ function setFormDisabled(formEl, disabled) {
 }
 
 async function loadAllowlist() {
-  return fetch("./alumni_portal.csv")
+  return fetch("/alumni_portal.csv")
     .then((res) => {
       if (!res.ok) throw new Error("Unable to load alumni allowlist.");
       return res.text();
@@ -351,7 +364,7 @@ function renderRegisteredUsers() {
     .map(u => `
       <div class="flex h-full flex-col items-center rounded-2xl border border-rose-100 bg-white p-4 text-slate-800 shadow-lg shadow-rose-900/10 transition hover:-translate-y-0.5 hover:shadow-rose-900/20" style="display:flex;flex-direction:column;align-items:center;">
         <div class="w-full overflow-hidden rounded-2xl bg-rose-50 p-2" style="width:100%;">
-          ${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">` : `<img src="./anonymous.jpg" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">`}
+          ${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">` : `<img src="${defaultHeadshotUrl}" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">`}
         </div>
         <div class="mt-4 w-full space-y-2 text-center" style="width:100%;text-align:center;">
           <a href="#" class="user-link block text-lg font-semibold tracking-tight text-slate-900 transition hover:text-rose-600" data-uid="${u.uid}">${u.name || "—"}</a>
@@ -374,7 +387,7 @@ function renderRegisteredUsers() {
 
       const data = docSnap.data();
       const modal = document.getElementById("user-detail-modal");
-      modal.querySelector("#detail-headshot").src = data.headshotUrl || "./anonymous.jpg";
+      modal.querySelector("#detail-headshot").src = data.headshotUrl || defaultHeadshotUrl;
       modal.querySelector("#detail-name").textContent = data.name || "—";
       modal.querySelector("#detail-email").textContent = data.email || "—";
       modal.querySelector("#detail-gradyear").textContent = `Grad Year: ${data.gradYear || "—"}`;
@@ -542,7 +555,7 @@ onAuthStateChanged(auth, async (user) => {
             userHeadshot.alt = `${data.name || "User"}'s photo`;
             userHeadshot.classList.remove("bg-rose-100");
           } else {
-            userHeadshot.src = "./anonymous.jpg"; 
+            userHeadshot.src = defaultHeadshotUrl; 
             userHeadshot.alt = "Anonymous user";
             userHeadshot.classList.add("bg-rose-100");
           }
