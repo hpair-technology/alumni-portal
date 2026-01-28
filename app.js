@@ -364,7 +364,7 @@ function renderRegisteredUsers() {
     .map(u => `
       <div class="flex h-full flex-col items-center rounded-2xl border border-rose-100 bg-white p-4 text-slate-800 shadow-lg shadow-rose-900/10 transition hover:-translate-y-0.5 hover:shadow-rose-900/20" style="display:flex;flex-direction:column;align-items:center;">
         <div class="w-full overflow-hidden rounded-2xl bg-rose-50 p-2" style="width:100%;">
-          ${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">` : `<img src="${defaultHeadshotUrl}" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">`}
+          ${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-40 w-full rounded-xl object-cover sm:h-48" style="display:block;width:100%;object-fit:cover;">` : `<img src="${defaultHeadshotUrl}" class="h-40 w-full rounded-xl object-cover sm:h-48" style="display:block;width:100%;object-fit:cover;">`}
         </div>
         <div class="mt-4 w-full space-y-2 text-center" style="width:100%;text-align:center;">
           <a href="#" class="user-link block text-lg font-semibold tracking-tight text-slate-900 transition hover:text-rose-600" data-uid="${u.uid}">${u.name || "—"}</a>
