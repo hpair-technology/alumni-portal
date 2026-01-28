@@ -1,4 +1,4 @@
-import { firebaseConfig } from "./firebase-config.js";
+import { firebaseConfig } from "./firebase-config.js?v=2";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -23,7 +23,10 @@ import {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage();
+const storageBucket = firebaseConfig.storageBucket?.startsWith("gs://")
+  ? firebaseConfig.storageBucket
+  : `gs://${firebaseConfig.storageBucket}`;
+const storage = getStorage(app, storageBucket);
 
 const registerForm = document.getElementById("register-form");
 const registerEmail = document.getElementById("register-email");
@@ -32,6 +35,7 @@ const loginForm = document.getElementById("login-form");
 const loginEmail = document.getElementById("login-email");
 const loginPassword = document.getElementById("login-password");
 const logoutBtn = document.getElementById("logout-btn");
+const editProfileBtn = document.getElementById("edit-profile-btn");
 const authSection = document.getElementById("auth-section");
 const userSection = document.getElementById("user-section");
 const userEmail = document.getElementById("user-email");
@@ -43,11 +47,14 @@ const profileForm = document.getElementById("profile-form");
 const profileName = document.getElementById("profile-name");
 const profileYear = document.getElementById("profile-year");
 const profileHeadshot = document.getElementById("profile-headshot");
+const profileBio = document.getElementById("profile-bio");
 const searchNameInput = document.getElementById("search-name");
 const searchYearInput = document.getElementById("search-year");
 const searchIndustryInput = document.getElementById("search-industry");
 const otherCheckbox = document.getElementById("other-checkbox");
 const otherText = document.getElementById("other-text");
+const profileModal = document.getElementById("profile-modal");
+const closeProfileModalBtn = document.getElementById("close-profile-modal");
 const messageErrorClasses = ["border-rose-700", "text-rose-700", "bg-rose-50"];
 const messageOkClasses = ["border-rose-400", "text-slate-700", "bg-white"];
 
@@ -55,6 +62,35 @@ if (otherCheckbox && otherText) {
   otherCheckbox.addEventListener("change", () => {
     otherText.disabled = !otherCheckbox.checked;
     if (!otherCheckbox.checked) otherText.value = "";
+  });
+}
+
+function openProfileModal() {
+  if (!profileModal) return;
+  profileModal.classList.remove("hidden");
+}
+
+function closeProfileModal() {
+  if (!profileModal) return;
+  profileModal.classList.add("hidden");
+}
+
+if (editProfileBtn) {
+  editProfileBtn.addEventListener("click", () => {
+    openProfileModal();
+  });
+}
+
+if (closeProfileModalBtn) {
+  closeProfileModalBtn.addEventListener("click", closeProfileModal);
+}
+
+if (profileModal) {
+  profileModal.addEventListener("click", (event) => {
+    if (event.target === profileModal) closeProfileModal();
+  });
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeProfileModal();
   });
 }
 
@@ -230,6 +266,7 @@ profileForm.addEventListener("submit", async (e) => {
     const updateData = {
       name: profileName.value.trim(),
       gradYear: profileYear.value ? Number(profileYear.value) : "",
+      bio: profileBio?.value.trim() || "",
       industries: selectedIndustries,
       updatedAt: serverTimestamp(),
     };
@@ -247,6 +284,7 @@ profileForm.addEventListener("submit", async (e) => {
 
     showMessage("Profile updated successfully!");
     renderRegisteredUsers();
+    closeProfileModal();
   } catch (err) {
     console.error("Profile save error:", err);
     showMessage(err.message || "Failed to save profile.", true);
@@ -256,10 +294,11 @@ profileForm.addEventListener("submit", async (e) => {
 });
 
 function showRegisteredPlaceholder(text) {
-  registeredBody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-sm text-slate-500">${text}</td></tr>`;
+  registeredBody.innerHTML = `<div class="rounded-xl border border-rose-100 bg-rose-50 px-4 py-6 text-sm text-slate-600">${text}</div>`;
 }
 
 function showPresencePlaceholder(text) {
+  if (!presenceBody) return;
   presenceBody.innerHTML = `<tr><td colspan="2" class="px-4 py-6 text-sm text-slate-500">${text}</td></tr>`;
 }
 
@@ -304,18 +343,22 @@ function renderRegisteredUsers() {
   });
 
   if (!filtered.length) {
-    registeredBody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-sm text-slate-500">No matching users found.</td></tr>`;
+    registeredBody.innerHTML = `<div class="rounded-xl border border-rose-100 bg-rose-50 px-4 py-6 text-sm text-slate-600">No matching users found.</div>`;
     return;
   }
 
   registeredBody.innerHTML = filtered
     .map(u => `
-      <tr class="align-middle">
-        <td class="px-4 py-3">${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-12 w-12 rounded-full object-cover shadow-sm">` : `<img src="./anonymous.jpg" class="h-12 w-12 rounded-full object-cover shadow-sm">`}</td>
-        <td class="px-4 py-3"><a href="#" class="user-link font-semibold text-rose-800 transition hover:text-rose-600" data-uid="${u.uid}">${u.name || "—"}</a></td>
-        <td class="px-4 py-3 text-slate-600">${u.gradYear || "—"}</td>
-        <td class="px-4 py-3 text-slate-600">${u.email}</td>
-      </tr>
+      <div class="flex h-full flex-col items-center rounded-2xl border border-rose-100 bg-white p-4 text-slate-800 shadow-lg shadow-rose-900/10 transition hover:-translate-y-0.5 hover:shadow-rose-900/20" style="display:flex;flex-direction:column;align-items:center;">
+        <div class="w-full overflow-hidden rounded-2xl bg-rose-50 p-2" style="width:100%;">
+          ${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">` : `<img src="./anonymous.jpg" class="h-52 w-full rounded-xl object-cover" style="display:block;width:100%;height:208px;object-fit:cover;">`}
+        </div>
+        <div class="mt-4 w-full space-y-2 text-center" style="width:100%;text-align:center;">
+          <a href="#" class="user-link block text-lg font-semibold tracking-tight text-slate-900 transition hover:text-rose-600" data-uid="${u.uid}">${u.name || "—"}</a>
+          <p class="text-sm text-slate-600">${u.email || "Email —"}</p>
+          <p class="text-xs text-slate-500">${u.gradYear ? `Class of ${u.gradYear}` : "Grad year —"}</p>
+        </div>
+      </div>
     `)
     .join("");
 
@@ -335,6 +378,7 @@ function renderRegisteredUsers() {
       modal.querySelector("#detail-name").textContent = data.name || "—";
       modal.querySelector("#detail-email").textContent = data.email || "—";
       modal.querySelector("#detail-gradyear").textContent = `Grad Year: ${data.gradYear || "—"}`;
+      modal.querySelector("#detail-bio").textContent = data.bio || "";
       modal.querySelector("#detail-industries").textContent = `Industries: ${data.industries?.join(", ") || "—"}`;
 
       modal.classList.remove("hidden");
@@ -358,6 +402,7 @@ function stopRegisteredListener() {
 }
 
 function startPresenceListener() {
+  if (!presenceBody) return;
   stopPresenceListener();
   const q = query(collection(db, "presence"), orderBy("email"));
   presenceUnsubscribe = onSnapshot(
@@ -459,6 +504,7 @@ onAuthStateChanged(auth, async (user) => {
           const data = profileSnap.data();
           profileName.value = data.name || "";
           profileYear.value = data.gradYear || "";
+          if (profileBio) profileBio.value = data.bio || "";
 
           const userIndustries = data.industries || [];
           let otherValue = "";
