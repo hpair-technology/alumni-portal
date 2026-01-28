@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alumni Portal</title>
+  <title>HPAIR Alumni Portal</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
@@ -47,42 +47,113 @@
     </section>
 
     <section id="user-section" class="card hidden">
-      <div class="user-header">
-        <div>
-          <p class="muted">Signed in as</p>
+      <div class="signed-in-info">
+        <img id="user-headshot" class="avatar small-avatar placeholder" src="" alt="User headshot">
+        <div class="signed-in-text">
+          <p id="signed-in-as" class="muted">Signed in as —</p>
           <p id="user-email" class="user-email"></p>
-        </div>
-        <div class="actions">
-          <button id="logout-btn" type="button" class="secondary">Sign Out</button>
+          <p></p>
+          <button id="logout-btn">Log Out</button>
         </div>
       </div>
 
-     
+      <div class="profile-editor">
+        <h3>Your Profile</h3>
+
+        <form id="profile-form" class="form">
+          <label>
+            Full name
+            <input id="profile-name" type="text" placeholder="Your name">
+          </label>
+
+          <label>
+            Graduation year
+            <input id="profile-year" type="number" min="1900" max="2100">
+          </label>
+
+          <label>
+            Headshot
+            <input id="profile-headshot" type="file" accept="image/*">
+          </label>
+
+          <fieldset id="profile-industries" class="checkbox-group grid-industries">
+            <legend>Industries you have experience in</legend>
+
+            <label><input type="checkbox" value="Academia/Research"> Academia/Research</label>
+            <label><input type="checkbox" value="Arts/Entertainment"> Arts/Entertainment</label>
+            <label><input type="checkbox" value="Engineering"> Engineering</label>
+            <label><input type="checkbox" value="Financial Services (including Private Equity/Hedge Funds)"> Financial Services</label>
+            <label><input type="checkbox" value="Government/Politics"> Government/Politics</label>
+            <label><input type="checkbox" value="Healthcare"> Healthcare</label>
+            <label><input type="checkbox" value="Management Consulting"> Management Consulting</label>
+            <label><input type="checkbox" value="Media"> Media</label>
+            <label><input type="checkbox" value="Non-Profit/Social Enterprise"> Non-Profit/Social Enterprise</label>
+
+            <label class="other-industry">
+              <input type="checkbox" value="Other" id="other-checkbox"> Other
+              <input type="text" id="other-text" placeholder="Specify industry" disabled>
+            </label>
+          </fieldset>
+
+          <button type="submit">Save Profile</button>
+          <p class="hint">This information is visible to other alumni.</p>
+        </form>
+      </div>
 
       <div class="table-wrapper">
         <div class="table-head">
           <h3>All registered users</h3>
           <p class="muted small">List of every account that has been created.</p>
+          <div class="search-filters">
+            <input type="text" id="search-name" placeholder="Search by name…">
+            <input type="number" id="search-year" placeholder="Filter by graduation year…" min="1900" max="2100">
+            <select id="search-industry">
+              <option value="">All industries</option>
+              <option value="Academia/Research">Academia/Research</option>
+              <option value="Arts/Entertainment">Arts/Entertainment</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Financial Services (including Private Equity/Hedge Funds)">Financial Services</option>
+              <option value="Government/Politics">Government/Politics</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Management Consulting">Management Consulting</option>
+              <option value="Media">Media</option>
+              <option value="Non-Profit/Social Enterprise">Non-Profit/Social Enterprise</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
         </div>
+
         <table>
           <thead>
             <tr>
+              <th>Headshot</th>
+              <th>Name</th>
+              <th>Year</th>
               <th>Email</th>
             </tr>
           </thead>
-          <tbody id="registered-body">
-            <tr>
-              <td class="muted">Loading…</td>
-            </tr>
-          </tbody>
+          <tbody id="registered-body"></tbody>
         </table>
       </div>
+
     </section>
 
     <section id="messages" class="card hidden"></section>
   </main>
 
   <script type="module" src="./app.js"></script>
+
+  <div id="user-detail-modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="close-modal">&times;</span>
+      <img id="detail-headshot" class="avatar" src="./anonymous.jpg" alt="Headshot">
+      <h2 id="detail-name">Name</h2>
+      <p id="detail-email">Email</p>
+      <p id="detail-gradyear">Grad Year</p>
+      <p id="detail-industries">Industries: </p>
+    </div>
+  </div>
+
 </body>
 </html>
 
