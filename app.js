@@ -48,6 +48,8 @@ const searchYearInput = document.getElementById("search-year");
 const searchIndustryInput = document.getElementById("search-industry");
 const otherCheckbox = document.getElementById("other-checkbox");
 const otherText = document.getElementById("other-text");
+const messageErrorClasses = ["border-rose-700", "text-rose-700", "bg-rose-50"];
+const messageOkClasses = ["border-rose-400", "text-slate-700", "bg-white"];
 
 if (otherCheckbox && otherText) {
   otherCheckbox.addEventListener("change", () => {
@@ -73,7 +75,13 @@ function showMessage(text, isError = false) {
     return;
   }
   messages.textContent = text;
-  messages.classList.toggle("error", Boolean(isError));
+  if (isError) {
+    messages.classList.add(...messageErrorClasses);
+    messages.classList.remove(...messageOkClasses);
+  } else {
+    messages.classList.add(...messageOkClasses);
+    messages.classList.remove(...messageErrorClasses);
+  }
   messages.classList.remove("hidden");
 }
 
@@ -234,7 +242,7 @@ profileForm.addEventListener("submit", async (e) => {
       const userHeadshot = document.getElementById("user-headshot");
       userHeadshot.src = headshotUrl;
       userHeadshot.alt = `${profileName.value}'s photo`;
-      userHeadshot.classList.remove("placeholder");
+      userHeadshot.classList.remove("bg-rose-100");
     }
 
     showMessage("Profile updated successfully!");
@@ -248,11 +256,11 @@ profileForm.addEventListener("submit", async (e) => {
 });
 
 function showRegisteredPlaceholder(text) {
-  registeredBody.innerHTML = `<tr><td colspan="4" class="muted">${text}</td></tr>`;
+  registeredBody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-sm text-slate-500">${text}</td></tr>`;
 }
 
 function showPresencePlaceholder(text) {
-  presenceBody.innerHTML = `<tr><td colspan="2" class="muted">${text}</td></tr>`;
+  presenceBody.innerHTML = `<tr><td colspan="2" class="px-4 py-6 text-sm text-slate-500">${text}</td></tr>`;
 }
 
 function startRegisteredListener() {
@@ -296,17 +304,17 @@ function renderRegisteredUsers() {
   });
 
   if (!filtered.length) {
-    registeredBody.innerHTML = `<tr><td colspan="4" class="muted">No matching users found.</td></tr>`;
+    registeredBody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-sm text-slate-500">No matching users found.</td></tr>`;
     return;
   }
 
   registeredBody.innerHTML = filtered
     .map(u => `
-      <tr>
-        <td>${u.headshotUrl ? `<img src="${u.headshotUrl}" class="avatar">` : `<img src="./anonymous.jpg" class="avatar">`}</td>
-        <td><a href="#" class="user-link" data-uid="${u.uid}">${u.name || "—"}</a></td>
-        <td>${u.gradYear || "—"}</td>
-        <td>${u.email}</td>
+      <tr class="align-middle">
+        <td class="px-4 py-3">${u.headshotUrl ? `<img src="${u.headshotUrl}" class="h-12 w-12 rounded-full object-cover shadow-sm">` : `<img src="./anonymous.jpg" class="h-12 w-12 rounded-full object-cover shadow-sm">`}</td>
+        <td class="px-4 py-3"><a href="#" class="user-link font-semibold text-rose-800 transition hover:text-rose-600" data-uid="${u.uid}">${u.name || "—"}</a></td>
+        <td class="px-4 py-3 text-slate-600">${u.gradYear || "—"}</td>
+        <td class="px-4 py-3 text-slate-600">${u.email}</td>
       </tr>
     `)
     .join("");
@@ -486,11 +494,11 @@ onAuthStateChanged(auth, async (user) => {
           if (data.headshotUrl) {
             userHeadshot.src = data.headshotUrl;
             userHeadshot.alt = `${data.name || "User"}'s photo`;
-            userHeadshot.classList.remove("placeholder");
+            userHeadshot.classList.remove("bg-rose-100");
           } else {
             userHeadshot.src = "./anonymous.jpg"; 
             userHeadshot.alt = "Anonymous user";
-            userHeadshot.classList.add("placeholder");
+            userHeadshot.classList.add("bg-rose-100");
           }
         } else {
           console.warn("Profile doc missing for user:", user.uid);
