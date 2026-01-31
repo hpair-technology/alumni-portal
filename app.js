@@ -68,6 +68,14 @@ const defaultHeadshotUrl = `data:image/svg+xml;utf8,${encodeURIComponent(default
 const userHeadshotEl = document.getElementById("user-headshot");
 const detailHeadshotEl = document.getElementById("detail-headshot");
 
+let cropper = null;
+let croppedBlob = null;
+
+const cropModal = document.getElementById("crop-modal");
+const cropImage = document.getElementById("crop-image");
+const cropSaveBtn = document.getElementById("crop-save");
+const cropCancelBtn = document.getElementById("crop-cancel");
+
 if (userHeadshotEl) userHeadshotEl.src = defaultHeadshotUrl;
 if (detailHeadshotEl) detailHeadshotEl.src = defaultHeadshotUrl;
 
@@ -77,6 +85,79 @@ if (otherCheckbox && otherText) {
     if (!otherCheckbox.checked) otherText.value = "";
   });
 }
+    
+profileHeadshot.addEventListener("change", () => {
+  const file = profileHeadshot.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showMessage("Please upload an image file.", true);
+    profileHeadshot.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    cropImage.src = reader.result;
+    cropModal.classList.remove("hidden");
+
+    if (cropper) cropper.destroy();
+    cropper = new Cropper(cropImage, {
+      aspectRatio: 1,
+      viewMode: 1,
+      autoCropArea: 1,
+      background: false,
+      responsive: true,
+      movable: true,
+      zoomable: true,
+      scalable: false,
+      rotatable: false,
+    });
+  };
+
+  reader.readAsDataURL(file);
+});
+
+cropSaveBtn.addEventListener("click", () => {
+  if (!cropper) return;
+
+  const canvas = cropper.getCroppedCanvas({
+    width: 600,
+    height: 600,
+    imageSmoothingQuality: "high",
+  });
+
+  canvas.toBlob(
+    (blob) => {
+      croppedBlob = blob;
+
+      // Preview immediately
+      const previewUrl = URL.createObjectURL(blob);
+      if (userHeadshotEl) {
+        userHeadshotEl.src = previewUrl;
+        userHeadshotEl.classList.remove("bg-rose-100");
+      }
+
+      cropModal.classList.add("hidden");
+      cropper.destroy();
+      cropper = null;
+    },
+    "image/jpeg",
+    0.9
+  );
+});
+
+cropCancelBtn.addEventListener("click", () => {
+  cropModal.classList.add("hidden");
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  croppedBlob = null;
+  profileHeadshot.value = "";
+});
 
 function openProfileModal() {
   if (!profileModal) return;
@@ -251,11 +332,13 @@ profileForm.addEventListener("submit", async (e) => {
   let headshotUrl = null;
 
   try {
-    if (profileHeadshot.files.length > 0) {
-      const file = profileHeadshot.files[0];
-      console.log("Uploading headshot for user:", currentUser.uid, file.name, file.size);
+    if (profileHeadshot.files.length > 0 || croppedBlob) {
+      const file = croppedBlob || profileHeadshot.files[0];
+      console.log("Uploading headshot for user:", currentUser.uid);
 
-      if (file.size > 5 * 1024 * 1024) throw new Error("Headshot file too large.");
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("Headshot file too large.");
+      }
 
       const fileRef = ref(storage, `headshots/${currentUser.uid}`);
       await uploadBytes(fileRef, file);
@@ -298,6 +381,8 @@ profileForm.addEventListener("submit", async (e) => {
     showMessage("Profile updated successfully!");
     renderRegisteredUsers();
     closeProfileModal();
+    croppedBlob = null;
+    profileHeadshot.value = "";
   } catch (err) {
     console.error("Profile save error:", err);
     showMessage(err.message || "Failed to save profile.", true);
