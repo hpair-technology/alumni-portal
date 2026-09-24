@@ -1,11 +1,12 @@
 {
   "dependencies": {
+    "cropperjs": "^1.6.3",
     "firebase": "^12.8.0"
   },
   "name": "alumni-portal",
   "version": "1.0.0",
-  "description": "Single-page alumni portal with Firebase auth, online presence, and user registry.",
-  "main": "app.js",
+  "description": "HPAIR Alumni Portal: public landing page at / and a Firebase-backed members portal at /portal.",
+  "main": "src/js/portal.js",
   "devDependencies": {
     "vite": "^7.3.1"
   },
@@ -21,7 +22,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/hpair-technology/alumni-portal/issues"
   },

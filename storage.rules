@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// ============================================================================
+// HPAIR Alumni Portal: Cloud Storage security rules
+// Deploy:  firebase deploy --only storage
+// ============================================================================
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() { return request.auth != null; }
+    function uid()      { return request.auth.uid; }
+    function email() {
+      return request.auth.token.email != null ? request.auth.token.email.lower() : '';
+    }
+    function isStaffEmail() {
+      return signedIn() && email() in ['tech-help@hpair.org', 'finance@hpair.org', 'cqiu@college.harvard.edu'];
+    }
+    function isMember() { return signedIn(); }
+    // Mirrors isAdmin() in firestore.rules. exists() first: get() on a missing
+    // document fails the whole rule.
+    function isStaff() {
+      return signedIn() && (
+        isStaffEmail()
+        || (firestore.exists(/databases/(default)/documents/users/$(uid()))
+            && firestore.get(/databases/(default)/documents/users/$(uid())).data.get('role', '') == 'admin')
+      );
+    }
+    function isImage() { return request.resource.contentType.matches('image/.*'); }
+    function isPdf()   { return request.resource.contentType == 'application/pdf'; }
+    function under(mb) { return request.resource.size < mb * 1024 * 1024; }
+
+    // Profile headshots: one file per user, named after their uid.
+    match /headshots/{userId} {
+      allow read:  if isMember();
+      allow write: if isMember() && userId == uid() && isImage() && under(5);
+    }
+
+    // Career Hub attachments (job descriptions, flyers, one-pagers).
+    match /opportunities/{userId}/{fileName} {
+      allow read:  if isMember();
+      allow write: if isMember() && userId == uid() && under(8) && (isImage() || isPdf());
+    }
+
+    // Ambassador application uploads: readable by the applicant and staff.
+    match /ambassador/{userId}/{fileName} {
+      allow read:  if isStaff() || (isMember() && userId == uid());
+      allow write: if isMember() && userId == uid() && under(8);
+    }
+
+    // Milestone cover images and event images (staff authored).
+    match /milestones/{fileName} {
+      allow read:  if isMember();
+      allow write: if isStaff() && isImage() && under(8);
+    }
+    match /events/{fileName} {
+      allow read:  if isMember();
+      allow write: if isStaff() && isImage() && under(8);
+    }
+
+    // Conference photo library: what the team has published.
+    match /library/{fileName} {
+      allow read:  if isMember();
+      allow write: if isStaff() && isImage() && under(8);
+    }
+
+    // Photos alumni upload from the portal, pending review.
+    match /photo_submissions/{userId}/{fileName} {
+      allow read:  if isMember();
+      allow write: if isMember() && userId == uid() && isImage() && under(8);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

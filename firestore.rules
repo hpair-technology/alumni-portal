@@ -1,0 +1,156 @@
+rules_version = '2';
+
+// ============================================================================
+// HPAIR Alumni Portal: Firestore security rules
+// Deploy:  firebase deploy --only firestore:rules
+// (or paste into Firebase console -> Firestore Database -> Rules)
+//
+// Model
+//   * Any signed-in account may read. Registration is open.
+//   * People own their profile, their posts and their application.
+//   * Admins (staff emails, or users/{uid}.role == "admin") moderate everything.
+//
+// Keep the staff email list identical in src/js/config.js (ADMIN_EMAILS),
+// here, and in storage.rules. Changing one without the others means admins
+// see buttons whose writes are rejected.
+// ============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- helpers ---------------------------------------------------------
+    function signedIn() { return request.auth != null; }
+    function uid()      { return request.auth.uid; }
+
+    function email() {
+      return request.auth.token.email != null ? request.auth.token.email.lower() : '';
+    }
+    function isStaffEmail() {
+      return signedIn()
+          && email() in ['tech-help@hpair.org', 'finance@hpair.org', 'cqiu@college.harvard.edu'];
+    }
+    function isMember() { return signedIn(); }
+    function isAdmin() {
+      return signedIn() && (
+        isStaffEmail() ||
+        (exists(/databases/$(database)/documents/users/$(uid())) &&
+         get(/databases/$(database)/documents/users/$(uid())).data.get('role', '') == 'admin')
+      );
+    }
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+    function str(field, max) {
+      return request.resource.data.get(field, '') is string
+          && request.resource.data.get(field, '').size() <= max;
+    }
+
+    // ---- alumni profiles -------------------------------------------------
+    match /users/{userId} {
+      allow read: if isMember();
+
+      // You may create and edit your own profile, but you cannot grant yourself
+      // the admin role; only an existing admin can do that.
+      allow create: if isAdmin() || (
+        isMember() && userId == uid()
+        && request.resource.data.get('role', '') != 'admin'
+        && request.resource.data.email == email()
+        && str('name', 120) && str('bio', 600) && str('title', 120)
+        && str('company', 120) && str('location', 120) && str('linkedin', 300)
+      );
+
+      allow update: if isAdmin() || (
+        isMember() && userId == uid()
+        && !('role' in changedKeys())
+        && !('email' in changedKeys())
+        && str('name', 120) && str('bio', 600) && str('title', 120)
+        && str('company', 120) && str('location', 120) && str('linkedin', 300)
+      );
+
+      allow delete: if isAdmin() || (isMember() && userId == uid());
+    }
+
+    // ---- online presence -------------------------------------------------
+    match /presence/{userId} {
+      allow read:  if isMember();
+      allow write: if isMember() && userId == uid();
+    }
+
+    // ---- career hub ------------------------------------------------------
+    match /opportunities/{oppId} {
+      allow read: if isMember();
+      allow create: if isMember()
+                    && request.resource.data.posterUid == uid()
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && str('title', 160) && str('org', 160) && str('description', 1500);
+      allow update: if isAdmin() || (
+        isMember() && resource.data.posterUid == uid()
+        && !('posterUid' in changedKeys())
+        && str('title', 160) && str('org', 160) && str('description', 1500)
+      );
+      allow delete: if isAdmin() || (isMember() && resource.data.posterUid == uid());
+    }
+
+    // ---- milestones / newsletter (admin authored) ------------------------
+    match /milestones/{postId} {
+      allow read: if isMember();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---- upcoming events / conferences (admin authored) ------------------
+    match /events/{eventId} {
+      allow read: if isMember();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ---- conference photo library --------------------------------------
+    // Alumni submissions land as status:"pending"; only an admin can publish.
+    match /library_photos/{photoId} {
+      allow read: if isMember();
+
+      allow create: if isAdmin() || (
+        isMember()
+        && request.resource.data.uploaderUid == uid()
+        && request.resource.data.status == 'pending'
+        && request.resource.data.imageUrl is string
+        && str('caption', 200) && str('city', 80)
+      );
+
+      // A submitter may withdraw their own photo while it is still pending.
+      allow delete: if isAdmin() || (
+        isMember()
+        && resource.data.get('status', '') == 'pending'
+        && resource.data.uploaderUid == uid()
+      );
+
+      // The uploader may fix the caption, even after publication. hasOnly keeps
+      // status, imageUrl and uploaderUid out of reach.
+      allow update: if isAdmin() || (
+        isMember()
+        && resource.data.uploaderUid == uid()
+        && changedKeys().hasOnly(['caption', 'updatedAt'])
+        && str('caption', 200)
+      );
+    }
+
+    // ---- portal configuration (admin authored) ---------------------------
+    match /config/{docId} {
+      allow read: if isMember();
+      allow write: if isAdmin();
+    }
+
+    // ---- ambassador applications ----------------------------------------
+    // One submission per alum: the document id IS their uid.
+    match /ambassador_submissions/{userId} {
+      allow read:   if isAdmin() || (isMember() && userId == uid());
+      allow create: if isMember() && userId == uid() && request.resource.data.uid == uid();
+      allow update, delete: if isAdmin();
+    }
+
+    // ---- default deny ----------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

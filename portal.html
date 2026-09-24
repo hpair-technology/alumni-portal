@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HPAIR Alumni Portal</title>
+  <meta name="description" content="Members' portal of the Harvard College Project for Asian and International Relations alumni network.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F7F4EE">
+  <link rel="icon" type="image/png" href="/img/hpair-mark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/css/base.css">
+  <link rel="stylesheet" href="/src/css/portal.css">
+</head>
+<body class="portal">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="toast-stack"></div>
+  <div id="live-region" class="sr-only" aria-live="polite"></div>
+
+  <div id="sysbar" class="sysbar" role="status" hidden>
+    <span id="sysbar-text">Some data couldn't reach the database. Those sections are saved to this browser only.</span>
+    <button class="btn btn-sm btn-outline" type="button" id="sysbar-retry">Try again</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SIGNED-OUT VIEW
+       ══════════════════════════════════════════════════════════════════ -->
+  <div id="auth-view" class="auth">
+    <header class="auth-top container">
+      <a class="brand" href="/">
+        <img class="brand-mark" src="/img/hpair-mark.png" alt="" width="34" height="38">
+        <span class="brand-word">HPAIR Alumni</span>
+      </a>
+      <a class="small" href="/">Back to the front page</a>
+    </header>
+
+    <div class="auth-grid container">
+      <div class="auth-copy">
+        <h1>Alumni portal</h1>
+        <p class="lead">For past delegates, staff, speakers and partners of HPAIR conferences.</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs" role="tablist" aria-label="Sign in or create an account">
+          <button type="button" role="tab" id="tab-login" aria-selected="true" aria-controls="panel-login">Sign in</button>
+          <button type="button" role="tab" id="tab-register" aria-selected="false" aria-controls="panel-register">Create an account</button>
+        </div>
+
+        <div id="auth-alert" class="alert alert-error" role="alert" hidden></div>
+
+        <section id="panel-login" role="tabpanel" aria-labelledby="tab-login" class="auth-panel">
+          <form id="login-form" class="stack" novalidate>
+            <div class="field">
+              <label class="label" for="login-email">Email</label>
+              <input class="input" id="login-email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <div class="row between">
+                <label class="label" for="login-password">Password</label>
+                <button type="button" class="btn-link small" id="forgot-link">Forgot your password?</button>
+              </div>
+              <div class="input-wrap">
+                <input class="input" id="login-password" type="password" autocomplete="current-password" required>
+                <button type="button" class="btn btn-quiet btn-sm reveal" data-reveal="login-password">Show</button>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" id="login-remember" checked> Keep me signed in on this device</label>
+            <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+            <p class="help">New here? <button type="button" class="btn-link" data-goto="register">Create an account</button>.</p>
+          </form>
+        </section>
+
+        <section id="panel-register" role="tabpanel" aria-labelledby="tab-register" class="auth-panel" hidden>
+          <form id="register-form" class="stack" novalidate>
+            <div class="field">
+              <label class="label" for="register-name">Full name</label>
+              <input class="input" id="register-name" type="text" autocomplete="name" required maxlength="120">
+            </div>
+            <div class="field">
+              <label class="label" for="register-email">Email</label>
+              <input class="input" id="register-email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label class="label" for="register-password">Password</label>
+              <div class="input-wrap">
+                <input class="input" id="register-password" type="password" autocomplete="new-password" minlength="8" required>
+                <button type="button" class="btn btn-quiet btn-sm reveal" data-reveal="register-password">Show</button>
+              </div>
+              <div class="pw-meter" id="pw-meter" data-score="0" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+              <p class="help" id="pw-note">At least 8 characters.</p>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Create account</button>
+            <p class="help">Already registered? <button type="button" class="btn-link" data-goto="login">Sign in</button>.</p>
+          </form>
+        </section>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       SIGNED-IN VIEW
+       ══════════════════════════════════════════════════════════════════ -->
+  <div id="app-view" hidden>
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="/">
+          <img class="brand-mark" src="/img/hpair-mark.png" alt="" width="34" height="38">
+          <span class="brand-word">HPAIR Alumni</span>
+        </a>
+        <nav class="tabs" aria-label="Portal sections">
+          <button type="button" class="tab-btn" data-tab="directory" aria-selected="true">Directory <span class="count" id="count-alumni"></span></button>
+          <button type="button" class="tab-btn" data-tab="career" aria-selected="false">Opportunities <span class="count" id="count-career"></span></button>
+          <button type="button" class="tab-btn" data-tab="updates" aria-selected="false">Updates <span class="count" id="count-updates"></span></button>
+          <button type="button" class="tab-btn" data-tab="conferences" aria-selected="false">Conferences</button>
+          <button type="button" class="tab-btn" data-tab="ambassador" aria-selected="false">Ambassadors</button>
+          <button type="button" class="tab-btn admin-only" data-tab="admin" aria-selected="false" hidden>Admin</button>
+        </nav>
+        <div class="usermenu" id="usermenu">
+          <button type="button" class="usermenu-btn" id="usermenu-btn" aria-haspopup="true" aria-expanded="false">
+            <span class="avatar avatar-sm" id="user-avatar"></span>
+            <span class="usermenu-name" id="user-name-short"></span>
+          </button>
+          <div class="usermenu-pop" role="menu">
+            <div class="usermenu-id">
+              <b id="user-display-name"></b>
+              <span id="user-email" class="small muted"></span>
+              <span id="admin-badge-wrap" class="tag tag-brass" hidden>Administrator</span>
+            </div>
+            <button type="button" role="menuitem" id="menu-profile">Edit my profile</button>
+            <button type="button" role="menuitem" id="menu-view-me">View my profile</button>
+            <a role="menuitem" href="/">Front page</a>
+            <button type="button" role="menuitem" id="menu-logout">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="container portal-main">
+      <!-- DIRECTORY -->
+      <section id="tab-directory" class="tab-panel" aria-labelledby="directory-heading">
+        <div class="section-head">
+          <h2 id="directory-heading">Directory</h2>
+        </div>
+        <div class="toolbar directory-toolbar">
+          <input class="input grow" id="search-name" type="search" placeholder="Search by name, organisation, role or city" aria-label="Search alumni">
+          <select class="select" id="search-year" aria-label="Class year"><option value="">Any class year</option></select>
+          <select class="select" id="search-industry" aria-label="Industry"><option value="">Any industry</option></select>
+          <select class="select" id="search-conference" aria-label="Conference attended"><option value="">Any conference</option></select>
+          <select class="select" id="search-mentoring" aria-label="Mentoring">
+            <option value="">Mentoring: any</option>
+            <option value="mentor">Open to mentoring</option>
+            <option value="mentee">Looking for a mentor</option>
+          </select>
+          <button type="button" class="btn btn-quiet btn-sm" id="clear-filters" hidden>Clear filters</button>
+        </div>
+        <div class="row between directory-meta">
+          <p class="small muted" id="directory-count"></p>
+          <div class="row">
+            <div id="online-strip" class="row" hidden>
+              <span class="small muted">Online now</span>
+              <div class="avatar-stack" id="online-avatars"></div>
+            </div>
+            <select class="select" id="sort-by" aria-label="Sort">
+              <option value="name">Sort: name</option>
+              <option value="recent">Sort: recently joined</option>
+              <option value="year">Sort: class year</option>
+              <option value="online">Sort: online first</option>
+            </select>
+          </div>
+        </div>
+        <div id="directory-list" class="people" role="list"></div>
+      </section>
+
+      <!-- OPPORTUNITIES -->
+      <section id="tab-career" class="tab-panel" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Opportunities</h2>
+          </div>
+          <button type="button" class="btn btn-primary" id="post-opportunity-btn">Post</button>
+        </div>
+        <div class="toolbar">
+          <input class="input grow" id="opp-search" type="search" placeholder="Search titles, organisations, cities" aria-label="Search opportunities">
+          <select class="select" id="opp-filter-type" aria-label="Type"><option value="">All types</option></select>
+          <select class="select" id="opp-filter-status" aria-label="Status">
+            <option value="open">Open only</option>
+            <option value="all">Include closed</option>
+            <option value="mine">Posted by me</option>
+          </select>
+        </div>
+        <div id="opportunities-list" class="opps"></div>
+      </section>
+
+      <!-- UPDATES -->
+      <section id="tab-updates" class="tab-panel" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Updates</h2>
+          </div>
+          <button type="button" class="btn btn-primary admin-only" id="post-milestone-btn" hidden>Post</button>
+        </div>
+        <div id="milestones-list" class="updates"></div>
+      </section>
+
+      <!-- CONFERENCES -->
+      <section id="tab-conferences" class="tab-panel" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Upcoming</h2>
+          </div>
+          <button type="button" class="btn btn-primary admin-only" id="add-event-btn" hidden>Add</button>
+        </div>
+        <div id="events-list"></div>
+
+        <div class="section-head section-gap">
+          <div>
+            <h2>Photo library</h2>
+            <p class="help">Submissions are reviewed before they appear.</p>
+          </div>
+          <div class="row">
+            <button type="button" class="btn btn-outline" id="submit-photo-btn">Submit photos</button>
+            <button type="button" class="btn btn-primary admin-only" id="add-photo-btn" hidden>Add to library</button>
+          </div>
+        </div>
+        <div id="photo-review" class="review" hidden></div>
+        <div class="toolbar">
+          <input class="input grow" id="photo-search" type="search" placeholder="Search captions, cities, years" aria-label="Search photographs">
+          <select class="select" id="photo-filter-year" aria-label="Year"><option value="">All years</option></select>
+        </div>
+        <div id="photo-grid" class="photos"></div>
+
+        <div class="section-head section-gap">
+          <div>
+            <h2>Feedback</h2>
+          </div>
+          <button type="button" class="btn btn-quiet admin-only" id="edit-forms-btn" hidden>Form link</button>
+        </div>
+        <div id="feedback-embed"></div>
+      </section>
+
+      <!-- AMBASSADORS -->
+      <section id="tab-ambassador" class="tab-panel" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Ambassadors</h2>
+            <p class="help">A one-year volunteer role.</p>
+          </div>
+          <div class="row admin-only" id="amb-admin-tools" hidden>
+            <label class="check"><input type="checkbox" id="amb-open-toggle"> Applications open</label>
+            <button type="button" class="btn btn-outline btn-sm" id="add-question-btn">Add a question</button>
+            <button type="button" class="btn btn-primary btn-sm" id="view-applications-btn"><span>Applications (<span id="count-submissions">0</span>)</span></button>
+          </div>
+        </div>
+        <div id="ambassador-form-container"></div>
+      </section>
+
+      <!-- ADMIN -->
+      <section id="tab-admin" class="tab-panel admin-only" hidden>
+        <div class="section-head">
+          <div>
+            <h2>Administration</h2>
+          </div>
+        </div>
+        <dl class="ledger" id="admin-overview"></dl>
+
+
+        <div class="section-head section-gap-sm">
+          <div>
+            <h3>Members</h3>
+          </div>
+        </div>
+        <div id="members-list" class="table-wrap"></div>
+      </section>
+    </main>
+
+    <footer class="portal-foot">
+      <div class="container row between">
+        <span class="small muted">© <span id="foot-year"></span> HPAIR · A student-run organization at Harvard College</span>
+        <span class="small"><a href="/">Front page</a> · <a href="https://www.hpair.org" target="_blank" rel="noopener">hpair.org</a> · <a href="mailto:tech-help@hpair.org">tech-help@hpair.org</a></span>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       PERSON DRAWER
+       ══════════════════════════════════════════════════════════════════ -->
+  <div id="person-drawer" class="drawer-backdrop" hidden>
+    <aside class="drawer" role="dialog" aria-modal="true" aria-labelledby="detail-name">
+      <button type="button" class="modal-close drawer-close" data-drawer-close aria-label="Close profile">&times;</button>
+      <div class="drawer-body">
+        <span class="avatar avatar-xl" id="detail-avatar"></span>
+        <p class="eyebrow" id="detail-eyebrow"></p>
+        <h2 id="detail-name"></h2>
+        <p id="detail-role" class="lead"></p>
+        <div id="detail-meta" class="tags"></div>
+        <div id="detail-bio" class="drawer-bio"></div>
+        <dl class="ledger drawer-facts" id="detail-facts"></dl>
+        <div id="detail-actions" class="row"></div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════════════
+       MODALS
+       ══════════════════════════════════════════════════════════════════ -->
+
+  <div id="forgot-modal" class="modal" hidden>
+    <div class="modal-card sm" role="dialog" aria-modal="true" aria-labelledby="forgot-title">
+      <div class="modal-head">
+        <div><h3 id="forgot-title">Reset your password</h3><p class="help">We'll email you a link.</p></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="forgot-form" class="modal-body">
+        <div class="field">
+          <label class="label" for="forgot-email">Email</label>
+          <input class="input" id="forgot-email" type="email" autocomplete="email" required>
+        </div>
+        <div id="forgot-alert" class="alert" hidden></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Send reset link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="profile-modal" class="modal" hidden>
+    <div class="modal-card lg" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+      <div class="modal-head">
+        <div>
+          <h3 id="profile-title">Your profile</h3>
+          <p class="help">Visible to signed-in alumni only.</p>
+        </div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="profile-form" class="modal-body">
+        <div class="profile-photo-row">
+          <span class="avatar avatar-lg" id="profile-avatar-preview"></span>
+          <div class="filedrop">
+            <div class="filedrop-text"><b>Choose a photograph</b><span>JPG or PNG, up to 12 MB.</span></div>
+            <input type="file" id="profile-headshot" accept="image/*" aria-label="Choose a photograph">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="profile-name">Full name <span class="req">*</span></label>
+            <input class="input" id="profile-name" type="text" autocomplete="name" required maxlength="120">
+          </div>
+          <div class="field">
+            <label class="label" for="profile-year">Class year</label>
+            <input class="input" id="profile-year" type="number" min="1991" max="2100" inputmode="numeric" placeholder="2019">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="profile-role">Current role</label>
+            <input class="input" id="profile-role" type="text" maxlength="120">
+          </div>
+          <div class="field">
+            <label class="label" for="profile-company">Organisation</label>
+            <input class="input" id="profile-company" type="text" autocomplete="organization" maxlength="120">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="profile-location">City</label>
+            <input class="input" id="profile-location" type="text" maxlength="120">
+          </div>
+          <div class="field">
+            <label class="label" for="profile-country">Country or region</label>
+            <input class="input" id="profile-country" type="text" autocomplete="country-name" maxlength="80">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="profile-linkedin">LinkedIn</label>
+            <input class="input" id="profile-linkedin" type="url" placeholder="linkedin.com/in/…" maxlength="300">
+          </div>
+          <div class="field">
+            <label class="label" for="profile-website">Website <span class="opt">(optional)</span></label>
+            <input class="input" id="profile-website" type="url" maxlength="300">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="profile-bio">About</label>
+          <textarea class="textarea" id="profile-bio" rows="4" maxlength="600"></textarea>
+          <p class="counter"><span id="bio-count">0</span>/600</p>
+        </div>
+
+        <fieldset class="field">
+          <legend class="label">Industries</legend>
+          <div class="check-grid" id="profile-industries"></div>
+          <label class="check other-check">
+            <input type="checkbox" id="other-checkbox" value="Other"> Other
+            <input class="input" type="text" id="other-text" placeholder="Which?" disabled maxlength="60">
+          </label>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend class="label">Conferences attended</legend>
+          <div class="row">
+            <select class="select grow" id="conference-picker" aria-label="Choose a conference"></select>
+            <button type="button" class="btn btn-outline" id="conference-add">Add</button>
+          </div>
+          <div class="tags" id="conference-tags"></div>
+        </fieldset>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="profile-mentoring">Mentoring</label>
+            <select class="select" id="profile-mentoring"></select>
+          </div>
+          <div class="field">
+            <span class="label">Contact</span>
+            <label class="check"><input type="checkbox" id="profile-show-email" checked> Show my email to other alumni</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="profile-save">Save profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="crop-modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="crop-title">
+      <div class="modal-head">
+        <div><h3 id="crop-title">Crop</h3></div>
+        <button type="button" class="modal-close" id="crop-cancel-x" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="crop-stage"><img id="crop-image" src="" alt="Photograph to crop"></div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" id="crop-cancel">Cancel</button>
+          <button type="button" class="btn btn-primary" id="crop-save">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="opportunity-modal" class="modal" hidden>
+    <div class="modal-card lg" role="dialog" aria-modal="true" aria-labelledby="opportunity-title">
+      <div class="modal-head">
+        <div><h3 id="opportunity-title">Post an opportunity</h3></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="opportunity-form" class="modal-body">
+        <input type="hidden" id="opp-id">
+        <div class="field-row">
+          <div class="field" style="grid-column: 1 / -1">
+            <label class="label" for="opp-title">Title <span class="req">*</span></label>
+            <input class="input" id="opp-title" type="text" required maxlength="160">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="opp-org">Organisation <span class="req">*</span></label>
+            <input class="input" id="opp-org" type="text" required maxlength="160">
+          </div>
+          <div class="field">
+            <label class="label" for="opp-type">Type</label>
+            <select class="select" id="opp-type"></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="opp-location">Location</label>
+            <input class="input" id="opp-location" type="text" maxlength="120" placeholder="City, or Remote">
+          </div>
+          <div class="field">
+            <label class="label" for="opp-deadline">Closing date</label>
+            <input class="input" id="opp-deadline" type="date">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="opp-desc">Description</label>
+          <textarea class="textarea" id="opp-desc" rows="5" maxlength="1500"></textarea>
+          <p class="counter"><span id="opp-desc-count">0</span>/1500</p>
+        </div>
+        <div class="field">
+          <label class="label" for="opp-link">Application link</label>
+          <input class="input" id="opp-link" type="url" placeholder="https://" maxlength="500">
+        </div>
+        <div class="field">
+          <span class="label">Attachment <span class="opt">(optional)</span></span>
+          <div class="filedrop">
+            <div class="filedrop-text"><b id="opp-file-name">Attach a PDF or image</b><span>Up to 8 MB</span></div>
+            <input type="file" id="opp-file" accept="image/*,.pdf,application/pdf" aria-label="Attachment">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="opp-submit">Post opportunity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="milestone-modal" class="modal" hidden>
+    <div class="modal-card lg" role="dialog" aria-modal="true" aria-labelledby="milestone-title">
+      <div class="modal-head">
+        <div><h3 id="milestone-title">Post an update</h3><p class="help">Blank lines start new paragraphs.</p></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="milestone-form" class="modal-body">
+        <input type="hidden" id="ms-id">
+        <input type="hidden" id="ms-image-current">
+        <div class="field">
+          <label class="label" for="ms-title">Title <span class="req">*</span></label>
+          <input class="input" id="ms-title" type="text" required maxlength="160">
+        </div>
+        <div class="field">
+          <label class="label" for="ms-content">Text <span class="req">*</span></label>
+          <textarea class="textarea" id="ms-content" rows="10" required maxlength="4000"></textarea>
+          <p class="counter"><span id="ms-count">0</span>/4000</p>
+        </div>
+        <div class="field">
+          <span class="label">Cover image <span class="opt">(optional)</span></span>
+          <div id="ms-image-preview" class="row" hidden>
+            <img id="ms-image-thumb" alt="" class="thumb">
+            <button type="button" class="btn btn-quiet btn-sm" id="ms-image-remove">Remove image</button>
+          </div>
+          <div class="filedrop">
+            <div class="filedrop-text"><b id="ms-file-name">Upload an image</b><span>JPG or PNG, up to 8 MB</span></div>
+            <input type="file" id="ms-file" accept="image/*" aria-label="Cover image">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="ms-submit">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="event-modal" class="modal" hidden>
+    <div class="modal-card lg" role="dialog" aria-modal="true" aria-labelledby="event-title">
+      <div class="modal-head">
+        <div><h3 id="event-title">Add an event</h3></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="event-form" class="modal-body">
+        <input type="hidden" id="ev-id">
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="ev-type">Type</label>
+            <select class="select" id="ev-type"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="ev-title">Title <span class="req">*</span></label>
+            <input class="input" id="ev-title" type="text" required maxlength="160" placeholder="Asia Conference 2027">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="ev-city">City</label>
+            <input class="input" id="ev-city" type="text" maxlength="80">
+          </div>
+          <div class="field">
+            <label class="label" for="ev-country">Country</label>
+            <input class="input" id="ev-country" type="text" maxlength="80">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="ev-start">Starts <span class="req">*</span></label>
+            <input class="input" id="ev-start" type="date" required>
+          </div>
+          <div class="field">
+            <label class="label" for="ev-end">Ends</label>
+            <input class="input" id="ev-end" type="date">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="ev-format">Format</label>
+            <select class="select" id="ev-format">
+              <option value="In person">In person</option>
+              <option value="Online">Online</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="ev-link">Link</label>
+            <input class="input" id="ev-link" type="url" placeholder="https://www.hpair.org/aconf" maxlength="500">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="ev-desc">Note <span class="opt">(optional)</span></label>
+          <textarea class="textarea" id="ev-desc" rows="3" maxlength="600"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="ev-submit">Save event</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="photo-modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="photo-modal-title">
+      <div class="modal-head">
+        <div><h3 id="photo-modal-title">Submit conference photographs</h3><p class="help" id="photo-modal-sub"></p></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="photo-form" class="modal-body">
+        <div class="field">
+          <span class="label">Photographs <span class="req">*</span></span>
+          <div class="filedrop">
+            <div class="filedrop-text"><b id="photo-file-name">Choose one or more images</b><span>JPG or PNG, up to 8 MB each</span></div>
+            <input type="file" id="photo-files" accept="image/*" multiple required aria-label="Photographs">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="label" for="photo-year">Year</label>
+            <input class="input" id="photo-year" type="number" min="1991" max="2100" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label class="label" for="photo-city">City</label>
+            <input class="input" id="photo-city" type="text" maxlength="80">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="photo-caption">Caption <span class="opt">(applies to every file)</span></label>
+          <input class="input" id="photo-caption" type="text" maxlength="200">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="photo-submit">Send for review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="caption-modal" class="modal" hidden>
+    <div class="modal-card sm" role="dialog" aria-modal="true" aria-labelledby="caption-title">
+      <div class="modal-head">
+        <div><h3 id="caption-title">Caption</h3></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="caption-form" class="modal-body">
+        <input type="hidden" id="caption-photo-id">
+        <div class="field">
+          <label class="label" for="caption-text">Caption</label>
+          <input class="input" id="caption-text" type="text" maxlength="200">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="caption-submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="forms-modal" class="modal" hidden>
+    <div class="modal-card sm" role="dialog" aria-modal="true" aria-labelledby="forms-title">
+      <div class="modal-head">
+        <div><h3 id="forms-title">Feedback form</h3><p class="help">Paste a Google Form link.</p></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="forms-form" class="modal-body">
+        <div class="field">
+          <label class="label" for="cfg-feedback-url">Form link</label>
+          <input class="input" id="cfg-feedback-url" type="url" placeholder="https://docs.google.com/forms/…">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="forms-submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="question-modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="question-title">
+      <div class="modal-head">
+        <div><h3 id="question-title">Add a question</h3></div>
+        <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+      </div>
+      <form id="question-form" class="modal-body">
+        <div class="field">
+          <label class="label" for="q-label">Question <span class="req">*</span></label>
+          <input class="input" id="q-label" type="text" required maxlength="300">
+        </div>
+        <div class="field">
+          <label class="label" for="q-type">Answer type</label>
+          <select class="select" id="q-type"></select>
+        </div>
+        <div class="field" id="q-options-section" hidden>
+          <label class="label" for="q-options">Options, one per line</label>
+          <textarea class="textarea" id="q-options" rows="4"></textarea>
+        </div>
+        <label class="check"><input type="checkbox" id="q-required" checked> Required</label>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary">Add question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="submissions-modal" class="modal" hidden>
+    <div class="modal-card xl" role="dialog" aria-modal="true" aria-labelledby="submissions-title">
+      <div class="modal-head">
+        <div><h3 id="submissions-title">Applications</h3></div>
+        <div class="row">
+          <button type="button" class="btn btn-outline btn-sm" id="export-submissions">Export CSV</button>
+          <button type="button" class="modal-close" data-close aria-label="Close">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" id="submissions-list"></div>
+    </div>
+  </div>
+
+  <div id="confirm-modal" class="modal" hidden>
+    <div class="modal-card sm" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+      <div class="modal-head">
+        <div><h3 id="confirm-title">Are you sure?</h3></div>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-text"></p>
+        <div class="form-actions">
+          <button type="button" class="btn btn-quiet" id="confirm-no">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirm-yes">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/js/portal.js"></script>
+</body>
+</html>

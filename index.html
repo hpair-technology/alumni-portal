@@ -4,184 +4,147 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HPAIR Alumni Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
+  <meta name="description" content="Alumni portal of the Harvard College Project for Asian and International Relations, for past delegates, staff, speakers and partners of HPAIR conferences.">
+  <meta name="theme-color" content="#F7F4EE">
+  <link rel="icon" type="image/png" href="/img/hpair-mark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/css/base.css">
+  <link rel="stylesheet" href="/src/css/landing.css">
 </head>
-<body class="min-h-screen bg-rose-50 text-slate-900">
-  <main class="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8">
-    <header class="rounded-2xl border border-rose-900/40 bg-gradient-to-br from-rose-900 via-rose-800 to-rose-950 p-5 text-rose-50 shadow-lg shadow-rose-900/20 sm:p-6">
-      <h1 class="text-xl font-semibold tracking-tight sm:text-2xl">HPAIR Alumni Portal</h1>
-      <p class="mt-2 text-sm text-rose-100/90">Register or log in with an approved alumni email.</p>
-    </header>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-    <section id="auth-section" class="rounded-2xl border border-rose-200/70 bg-white p-6 shadow-lg shadow-rose-900/10">
-      <div class="grid gap-8 md:grid-cols-2">
-        <div class="space-y-4">
-          <h2 class="text-lg font-semibold text-slate-900">Create Account</h2>
-          <form id="register-form" class="flex flex-col gap-4">
-            <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-              Email
-              <input id="register-email" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" type="email" required autocomplete="email">
-            </label>
-            <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-              Password
-              <input id="register-password" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" type="password" required minlength="6" autocomplete="new-password">
-            </label>
-            <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-rose-800 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">Register</button>
-            <p class="text-sm text-slate-500">Only emails in alumni_portal.csv are allowed.</p>
-          </form>
+  <header class="site-head">
+    <div class="container nav">
+      <a class="brand" href="/">
+        <img class="brand-mark" src="/img/hpair-mark.png" alt="" width="34" height="38">
+        <span class="brand-word">HPAIR Alumni</span>
+      </a>
+      <div class="nav-right">
+        <a class="nav-link" href="https://www.hpair.org" target="_blank" rel="noopener">hpair.org</a>
+        <a class="btn btn-primary" href="/portal">Sign in</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <section class="hero">
+      <figure class="hero-figure">
+        <img src="/img/aconf-delegates.jpg" alt="A delegate performs classical Indian dance on stage at an HPAIR Asia Conference" width="1600" height="1071" fetchpriority="high">
+      </figure>
+      <div class="container hero-copy">
+        <h1>Alumni portal</h1>
+        <p class="hero-lead">For past delegates, staff, speakers and partners of HPAIR conferences.</p>
+        <p class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="/portal">Sign in</a>
+          <span>or <a href="/portal#register">create an account</a></span>
+        </p>
+      </div>
+    </section>
+
+    <section class="section container" id="about">
+      <div class="about-grid">
+        <div>
+          <h2>What the portal contains</h2>
+          <p>Content is posted by HPAIR alumni and by the current board. The portal is visible only to signed-in members and is not indexed by search engines.</p>
         </div>
+        <dl class="ledger">
+          <div class="ledger-row">
+            <dt>Directory</dt>
+            <dd>Registered alumni, searchable by name, class year, industry, conference and city. A profile can include a photograph, a short biography, current position, a LinkedIn link, and whether the member is available for mentoring.</dd>
+          </div>
+          <div class="ledger-row">
+            <dt>Opportunities</dt>
+            <dd>Job, internship, fellowship and scholarship notices posted by members, each with a closing date. HPAIR posts its own calls for partners, speakers and host institutions here.</dd>
+          </div>
+          <div class="ledger-row">
+            <dt>Updates</dt>
+            <dd>Announcements from the current board, including conference dates, calls for volunteers and news about alumni.</dd>
+          </div>
+          <div class="ledger-row">
+            <dt>Conferences</dt>
+            <dd>Dates for the next Harvard Conference, Asia Conference and Virtual Conference, a photo archive that members can add to, and the post-conference feedback form.</dd>
+          </div>
+          <div class="ledger-row">
+            <dt>Ambassadors</dt>
+            <dd>The Alumni Ambassador application. Ambassadors serve for one year and represent HPAIR in their city or region.</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
 
-        <div class="space-y-4">
-          <h2 class="text-lg font-semibold text-slate-900">Log In</h2>
-          <form id="login-form" class="flex flex-col gap-4">
-            <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-              Email
-              <input id="login-email" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" type="email" required autocomplete="email">
-            </label>
-            <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-              Password
-              <input id="login-password" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" type="password" required autocomplete="current-password">
-            </label>
-            <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-rose-800 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">Log In</button>
-          </form>
+    <section class="globe-band" id="hosts">
+      <div class="container globe-grid">
+        <div class="globe-copy">
+          <h2>Asia Conference host cities</h2>
+          <p>HPAIR has held the Harvard Conference in Cambridge since 1991 and the Asia Conference in a partner city across the Asia-Pacific since 1992. Members list the conferences they attended on their profiles, and the directory can be filtered by conference.</p>
+          <p class="globe-hint">Select a year to turn the globe to that city.</p>
+          <ol class="host-list" id="host-list"></ol>
+          <p class="globe-note">If you notice an error in this list, email <a href="mailto:alumni@hpair.org">alumni@hpair.org</a>.</p>
+        </div>
+        <div class="globe-slot">
+          <div class="globe-stage" id="globe-stage" aria-hidden="true"></div>
         </div>
       </div>
     </section>
 
-    <section id="user-section" class="hidden rounded-2xl border border-rose-200/70 bg-white p-6 shadow-lg shadow-rose-900/10">
-      <div class="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-        <img id="user-headshot" class="h-20 w-20 rounded-full bg-rose-100 object-cover shadow" src="" alt="User headshot">
-        <div class="space-y-1">
-          <p id="signed-in-as" class="text-sm text-slate-500">Signed in as —</p>
-          <p id="user-email" class="text-sm font-semibold text-slate-900"></p>
-          <div class="mt-2 flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-            <button id="edit-profile-btn" class="inline-flex w-full items-center justify-center rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-800 shadow-sm transition hover:bg-rose-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 sm:w-auto">Edit Profile</button>
-            <button id="logout-btn" class="inline-flex w-full items-center justify-center rounded-xl bg-rose-800 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 sm:w-auto">Log Out</button>
-          </div>
+    <section class="section container" id="questions">
+      <h2>Questions</h2>
+      <div class="qa-grid">
+        <div class="qa">
+          <h3>Who can register</h3>
+          <p>Anyone who has taken part in an HPAIR conference as a delegate, staff member, speaker or partner. Create an account with your email address and a password.</p>
+        </div>
+        <div class="qa">
+          <h3>Which email address to use</h3>
+          <p>Use an address you check regularly. Password reset emails are sent to it.</p>
+        </div>
+        <div class="qa">
+          <h3>Who can see your profile</h3>
+          <p>Profiles are visible only to signed-in members and are not indexed by search engines. You can choose whether other members see your email address, and every field other than your name is optional.</p>
+        </div>
+        <div class="qa">
+          <h3>Resetting your password</h3>
+          <p>Select “Forgot your password?” on the sign-in page. A reset link is sent to your email address. If it does not arrive within a few minutes, check your spam folder.</p>
+        </div>
+        <div class="qa">
+          <h3>Posting a job or fellowship</h3>
+          <p>After signing in, go to Opportunities and select “Post”. You can include a closing date, an application link and a PDF. Postings can be edited or removed at any time.</p>
+        </div>
+        <div class="qa">
+          <h3>Technical problems</h3>
+          <p>Email <a href="mailto:tech-help@hpair.org">tech-help@hpair.org</a> describing what you were trying to do and which browser you were using. A screenshot is helpful.</p>
         </div>
       </div>
-
-      <div class="mt-10 space-y-4">
-        <div class="space-y-2">
-          <h3 class="text-lg font-semibold text-slate-900">All registered users</h3>
-          <p class="text-sm text-slate-500">List of every account that has been created.</p>
-          <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <input type="text" id="search-name" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" placeholder="Search by name…">
-            <input type="number" id="search-year" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" placeholder="Filter by graduation year…" min="1900" max="2100">
-            <select id="search-industry" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200">
-              <option value="">All industries</option>
-              <option value="Academia/Research">Academia/Research</option>
-              <option value="Arts/Entertainment">Arts/Entertainment</option>
-              <option value="Engineering">Engineering</option>
-              <option value="Financial Services (including Private Equity/Hedge Funds)">Financial Services</option>
-              <option value="Government/Politics">Government/Politics</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Management Consulting">Management Consulting</option>
-              <option value="Media">Media</option>
-              <option value="Non-Profit/Social Enterprise">Non-Profit/Social Enterprise</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-        </div>
-
-        <div id="registered-body" class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"></div>
-      </div>
-
     </section>
 
-    <section id="messages" class="hidden rounded-2xl border border-rose-200/70 bg-white p-4 text-sm shadow-sm"></section>
   </main>
 
-  <script src="https://unpkg.com/cropperjs/dist/cropper.js"></script>
-  <script type="module" src="./app.js?v=2"></script>
-
-  <div id="user-detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl">
-      <button id="close-modal" class="absolute right-4 top-4 text-2xl text-slate-500 transition hover:text-slate-700" aria-label="Close profile details">&times;</button>
-      <img id="detail-headshot" class="mx-auto h-24 w-24 rounded-full object-cover shadow" src="" alt="Headshot">
-      <h2 id="detail-name" class="mt-4 text-xl font-semibold text-slate-900">Name</h2>
-      <p id="detail-email" class="mt-2 text-sm text-slate-600">Email</p>
-      <p id="detail-gradyear" class="mt-1 text-sm text-slate-600">Grad Year</p>
-      <p id="detail-bio" class="mt-3 text-sm text-slate-600"></p>
-      <p id="detail-industries" class="mt-3 text-sm text-slate-600">Industries: </p>
-    </div>
-  </div>
-
-  <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-    <div class="relative w-full max-w-2xl rounded-2xl bg-white p-5 shadow-xl sm:p-6">
-      <button id="close-profile-modal" class="absolute right-4 top-4 text-2xl text-slate-500 transition hover:text-slate-700" aria-label="Close profile editor">&times;</button>
-      <h3 class="text-lg font-semibold text-slate-900">Edit Profile</h3>
-
-      <form id="profile-form" class="mt-4 flex flex-col gap-4">
-        <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-          Full name
-          <input id="profile-name" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" type="text" placeholder="Your name">
-        </label>
-
-        <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-          Graduation year
-          <input id="profile-year" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" type="number" min="1900" max="2100">
-        </label>
-
-        <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-          Headshot
-          <input id="profile-headshot" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm file:mr-4 file:rounded-lg file:border-0 file:bg-rose-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-rose-900 hover:file:bg-rose-200" type="file" accept="image/*">
-        </label>
-
-        <label class="flex flex-col gap-2 text-sm font-semibold text-slate-700">
-          Bio
-          <textarea id="profile-bio" class="w-full rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200" rows="4" placeholder="Share a short bio"></textarea>
-        </label>
-
-        <fieldset id="profile-industries" class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          <legend class="mb-2 text-sm font-semibold text-slate-700">Industries you have experience in</legend>
-
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Academia/Research" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Academia/Research</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Arts/Entertainment" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Arts/Entertainment</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Engineering" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Engineering</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Financial Services (including Private Equity/Hedge Funds)" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Financial Services</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Government/Politics" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Government/Politics</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Healthcare" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Healthcare</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Management Consulting" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Management Consulting</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Media" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Media</label>
-          <label class="flex items-center gap-2 text-sm text-slate-700"><input type="checkbox" value="Non-Profit/Social Enterprise" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Non-Profit/Social Enterprise</label>
-
-          <label class="flex items-center gap-2 text-sm text-slate-700 sm:col-span-2 lg:col-span-3">
-            <input type="checkbox" value="Other" id="other-checkbox" class="h-4 w-4 rounded border-rose-300 text-rose-700 focus:ring-rose-200"> Other
-            <input type="text" id="other-text" class="ml-2 flex-1 rounded-lg border border-rose-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-200 disabled:bg-slate-100" placeholder="Specify industry" disabled>
-          </label>
-        </fieldset>
-
-        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-rose-800 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600">Save Profile</button>
-        <p class="text-sm text-slate-500">This information is visible to other alumni.</p>
-      </form>
-    </div>
-  </div>
-
-  <div id="crop-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-    <div class="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-      <button id="crop-close" class="absolute right-4 top-4 text-2xl text-slate-500 transition hover:text-slate-700" aria-label="Close crop modal">&times;</button>
-
-      <h3 class="text-lg font-semibold text-slate-900 mb-4">Crop your headshot</h3>
-
-      <div class="w-full overflow-hidden rounded-lg">
-        <img id="crop-image" class="w-full" src="" alt="Crop preview">
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div>
+        <p class="footer-name">Harvard College Project for Asian and International Relations</p>
+        <p>A student organization at Harvard College, founded in 1991. It holds the Harvard Conference in Cambridge and the Asia Conference in a partner city in Asia each year.</p>
       </div>
-
-      <div class="mt-4 flex justify-end gap-2">
-        <button id="crop-cancel" type="button" class="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300">Cancel</button>
-        <button id="crop-save" type="button" class="px-4 py-2 rounded bg-rose-600 text-white hover:bg-rose-700">Use photo</button>
+      <div class="footer-links">
+        <p><a href="mailto:alumni@hpair.org">alumni@hpair.org</a> &nbsp;·&nbsp; Alumni Relations</p>
+        <p><a href="mailto:tech-help@hpair.org">tech-help@hpair.org</a> &nbsp;·&nbsp; Technical help</p>
+        <p>
+          <a href="https://www.hpair.org" target="_blank" rel="noopener">hpair.org</a> &nbsp;·&nbsp;
+          <a href="https://www.linkedin.com/company/harvard-project-for-asian-and-international-relations-hpair-" target="_blank" rel="noopener">LinkedIn</a> &nbsp;·&nbsp;
+          <a href="https://www.instagram.com/officialhpair/" target="_blank" rel="noopener">Instagram</a>
+        </p>
       </div>
     </div>
-  </div>
-  
-  <link
-    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
-    rel="stylesheet"
-  />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <div class="container footer-bottom">
+      <span>© <span id="foot-year">2026</span> HPAIR</span>
+      <span>Cambridge, Massachusetts</span>
+    </div>
+  </footer>
 
+  <script type="module" src="/src/js/landing.js"></script>
 </body>
 </html>
-
