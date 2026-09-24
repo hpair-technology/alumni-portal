@@ -111,6 +111,7 @@
           <span class="brand-word">HPAIR Alumni</span>
         </a>
         <nav class="tabs" aria-label="Portal sections">
+          <button type="button" class="tab-btn" data-tab="profile" aria-selected="false">Your profile <span class="count" id="count-profile"></span></button>
           <button type="button" class="tab-btn" data-tab="directory" aria-selected="true">Directory <span class="count" id="count-alumni"></span></button>
           <button type="button" class="tab-btn" data-tab="career" aria-selected="false">Opportunities <span class="count" id="count-career"></span></button>
           <button type="button" class="tab-btn" data-tab="updates" aria-selected="false">Updates <span class="count" id="count-updates"></span></button>
@@ -139,6 +140,18 @@
     </header>
 
     <main id="main" class="container portal-main">
+      <!-- YOUR PROFILE -->
+      <section id="tab-profile" class="tab-panel" hidden aria-labelledby="my-profile-heading">
+        <div class="section-head">
+          <div>
+            <h2 id="my-profile-heading">Your profile</h2>
+            <p class="help">This is your entry as other members see it.</p>
+          </div>
+          <button type="button" class="btn btn-primary" id="profile-edit-btn">Edit</button>
+        </div>
+        <div id="my-profile"></div>
+      </section>
+
       <!-- DIRECTORY -->
       <section id="tab-directory" class="tab-panel" aria-labelledby="directory-heading">
         <div class="section-head">

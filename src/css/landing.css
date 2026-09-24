@@ -63,7 +63,6 @@
 .globe-copy h2 { color: #fff; }
 .globe-copy > p { margin-top: 14px; color: rgba(255, 255, 255, .7); max-width: 38rem; }
 .globe-hint { font-size: var(--type-sm); color: rgba(255, 255, 255, .5); margin-top: 18px !important; }
-.globe-note { font-size: var(--type-xs); color: rgba(255, 255, 255, .45); margin-top: 16px !important; }
 .globe-band a { color: rgba(255, 255, 255, .9); text-decoration-color: var(--brass); }
 .globe-band a:hover { color: #fff; }
 

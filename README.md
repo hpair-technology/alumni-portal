@@ -19,7 +19,7 @@ Serve over HTTP. Opening the files from disk breaks the ES modules.
 
 ### Design preview without an account
 
-With `npm run dev` running, open **`/portal?preview=admin`** or **`/portal?preview=member`**. The signed-in portal renders with fictional sample data and no Firebase account. This exists so the team can review the design and copy; it is stripped from production builds.
+With `npm run dev` running, open **`/portal?preview=admin`**, **`/portal?preview=member`** or **`/portal?preview=new`** (a member whose entry is still unfinished). The signed-in portal renders with fictional sample data and no Firebase account. This exists so the team can review the design and copy; it is stripped from production builds.
 
 ---
 
@@ -49,6 +49,16 @@ The globe is fetched only when its section nears the viewport, and not at all be
 ## How access works
 
 Registration is open: anyone can create an account with an email address and a password, and any signed-in account can use the portal. Passwords are reset from the sign-in screen (Firebase sends the email).
+
+### Getting members to fill in their entry
+
+A directory is only worth having if the entries have something in them, so the portal asks three times, quietly, and never with a recurring popup:
+
+1. **"Your profile" is the first tab**, so editing your own entry is one click from anywhere rather than buried in the account menu.
+2. **The first sign-in on a browser opens the editor once.** It is keyed by uid in `localStorage` (`hpair:setup:<uid>`), so it does not come back on the next visit or in another tab. A member whose entry is still thin also *lands* on Your profile rather than the directory; once it has content, they land on the directory like everyone else.
+3. **Your own entry always leads the directory**, shown as others see it, and carries a line naming what is missing while it is still thin. Seeing your own blank row above ten filled-in ones does more than a nag would. Filters still apply, so you are not forced into results you do not match.
+
+"Thin" means at least two of these are missing: photograph, current position, class year, conferences attended, biography (`missingFields()` in `src/js/profile.js`). There is deliberately no percentage score.
 
 The old CSV allowlist is gone. If HPAIR later wants to restrict access again, the cleanest route is a Firestore `allowlist/{email}` collection checked in the rules (`exists(...)` in `isMember()`), never a list served from `public/`.
 

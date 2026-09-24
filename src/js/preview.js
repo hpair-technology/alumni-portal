@@ -1,8 +1,9 @@
 /* ============================================================================
    Design preview (development only)
    ----------------------------------------------------------------------------
-   `npm run dev`, then open /portal?preview=admin or /portal?preview=member to
-   see the signed-in portal filled with sample data and no Firebase account.
+   `npm run dev`, then open /portal?preview=admin, ?preview=member or
+   ?preview=new to see the signed-in portal filled with sample data and no
+   Firebase account. "new" is a member whose own entry is still unfinished.
    Vite strips this module from production builds: portal.js only imports it
    when import.meta.env.DEV is true. Every person below is fictional.
    ========================================================================== */
@@ -73,13 +74,22 @@ function fill(col, items) {
   col.mode = "local";
 }
 
+/* A member who has just registered: name and email only. */
+const NEW_MEMBER = {
+  id: "preview-me", email: "preview@hpair.org", name: "Eleanor Whitfield",
+  gradYear: "", title: "", company: "", location: "", country: "",
+  industries: [], conferences: [], mentoring: "", bio: "", headshotUrl: "",
+  linkedin: "", website: "", showEmail: true, role: "", createdAt: ago(1),
+};
+
 export function startPreview(mode, { enterShell }) {
   const admin = mode === "admin";
+  const fresh = mode === "new";
   state.user = ME;
-  state.profile = { ...USERS[0], role: admin ? "admin" : "" };
+  state.profile = fresh ? { ...NEW_MEMBER } : { ...USERS[0], role: admin ? "admin" : "" };
   state.mySubmission = null;
 
-  fill(Users, USERS);
+  fill(Users, fresh ? [NEW_MEMBER, ...USERS.slice(1)] : USERS);
   fill(Presence, [
     { id: "preview-me", status: "online", lastSeen: Date.now() },
     { id: "u2", status: "online", lastSeen: Date.now() - 60_000 },

@@ -66,6 +66,9 @@
 .tab-btn[aria-selected=true] { color: var(--ink); border-bottom-color: var(--crimson); font-weight: 600; }
 .tab-btn .count { font-size: .75rem; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .tab-btn .count:empty { display: none; }
+.tab-btn .count { color: var(--ink-3); }
+/* The profile tab marks an unfinished entry with a dot, not a count. */
+#count-profile { color: var(--brass-text); font-size: 1rem; line-height: 1; }
 
 .usermenu { position: relative; align-self: center; }
 .usermenu-btn {
@@ -135,6 +138,35 @@
   .person-line { white-space: normal; }
 }
 .sk-person { height: 72px; border-top: 1px solid var(--rule); }
+
+/* Your own entry leads the list, so it is separated from the rest. */
+.person-me { border-bottom: 1px solid var(--rule-strong); }
+.person-me + .person { border-top: 0; }
+/* ...and is marked while it is still thin. */
+.person-thin { box-shadow: inset 3px 0 0 var(--brass); padding-left: 14px; }
+.person-prompt { display: block; margin-top: 4px; font-size: var(--type-xs); color: var(--brass-text); }
+.person-prompt .btn-link { font-size: inherit; }
+
+/* ─── Your profile ─────────────────────────────────────────────────────── */
+.missing-note {
+  padding: 12px 16px; margin-bottom: 24px;
+  border-left: 3px solid var(--brass); background: var(--paper-2);
+  font-size: .9375rem; color: var(--ink-2);
+}
+.my-profile-card { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: start; }
+.my-profile-id { display: flex; flex-direction: column; gap: 6px; }
+.my-profile-id h3 { font-size: var(--type-h3); }
+.my-profile-id .tags { margin-top: 6px; }
+.my-profile-bio { margin-top: 22px; max-width: 42rem; color: var(--ink-2); line-height: 1.65; }
+.my-profile-bio p + p { margin-top: 10px; }
+.my-profile-facts { margin-top: 28px; max-width: 46rem; }
+.my-profile-facts .ledger-row { grid-template-columns: minmax(120px, 2fr) 7fr; padding: 14px 0; }
+.my-profile-facts dt { font-family: var(--sans); font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding-top: 3px; }
+.my-profile-facts dd { font-size: .9375rem; }
+@media (max-width: 640px) {
+  .my-profile-card { grid-template-columns: 1fr; gap: 16px; }
+  .my-profile-facts .ledger-row { grid-template-columns: 1fr; }
+}
 
 /* ─── Drawer ───────────────────────────────────────────────────────────── */
 .drawer-backdrop { position: fixed; inset: 0; z-index: 90; background: rgba(30, 30, 30, .45); }

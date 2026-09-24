@@ -1,6 +1,7 @@
 /* Alumni directory: filters, the list, and the profile drawer. */
 import { state, Users, isMe, on, emit } from "./state.js";
 import { INDUSTRIES, shortIndustry, MENTORING } from "./config.js";
+import { missingPrompt, isThin } from "./profile.js";
 import {
   $, $$, esc, safeUrl, avatarHtml, debounce, paragraphs, toMillis, formatDate, plural,
 } from "./util.js";
@@ -30,6 +31,7 @@ export function initDirectory() {
 
   const list = $("directory-list");
   list.addEventListener("click", (e) => {
+    if (e.target.closest("[data-edit-profile]")) return;   // handled in portal.js
     const row = e.target.closest(".person");
     if (row) openPerson(row.dataset.uid);
   });
@@ -106,6 +108,14 @@ export function renderDirectory() {
   });
 
   const active = Boolean(filters.q || filters.year || filters.industry || filters.conference || filters.mentoring);
+
+  // Your own entry always leads the list, whatever the sort, so the first thing
+  // you see is how you appear to everyone else. Filters still apply: if you do
+  // not match them you are not in the list, and there is nothing to pin.
+  const thin = isThin(state.profile);
+  const mine = list.findIndex((u) => isMe(u.id));
+  if (mine > 0) list.unshift(list.splice(mine, 1)[0]);
+
   $("clear-filters").hidden = !active;
   $("directory-count").textContent = total
     ? (active ? `${list.length} of ${plural(total, "alum", "alumni")}` : plural(total, "alum", "alumni"))
@@ -124,13 +134,15 @@ export function renderDirectory() {
     const line2 = confs.length
       ? confs[0] + (confs.length > 1 ? ` and ${plural(confs.length - 1, "other")}` : "")
       : inds.join(", ");
+    const prompt = me && thin ? missingPrompt(state.profile, { terse: true }) : null;
     return `
-    <article class="person" role="listitem" tabindex="0" data-uid="${esc(u.id)}" aria-label="Open ${esc(u.name || u.email)}">
+    <article class="person${me ? " person-me" : ""}${prompt ? " person-thin" : ""}" role="listitem" tabindex="0" data-uid="${esc(u.id)}" aria-label="Open ${esc(u.name || u.email)}">
       ${avatarHtml(u)}
       <div class="person-main">
         <span class="person-name">${esc(u.name || u.email.split("@")[0])}${me ? '<span class="you">you</span>' : ""}</span>
         ${line1.length ? `<span class="person-line">${line1.map(esc).join('<span class="sep">·</span>')}</span>` : ""}
         ${line2 ? `<span class="person-line muted">${esc(line2)}</span>` : ""}
+        ${prompt ? `<span class="person-prompt">${esc(prompt.text)} <button type="button" class="btn-link" data-edit-profile>Edit your profile</button></span>` : ""}
       </div>
       <div class="person-side">
         ${u.gradYear ? `<span class="tag num">Class of ${esc(String(u.gradYear))}</span>` : ""}

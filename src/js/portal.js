@@ -19,8 +19,8 @@ import {
 } from "./state.js";
 import { $, $$, avatarHtml, toast, wireModals, busy } from "./util.js";
 import { setPresenceOnline, setPresenceOffline, stopHeartbeat, recomputeOnline, renderOnline } from "./presence.js";
-import { initDirectory, renderDirectory, openPerson, closePerson } from "./directory.js";
-import { initProfile, openProfileModal } from "./profile.js";
+import { initDirectory, renderDirectory, closePerson } from "./directory.js";
+import { initProfile, openProfileModal, renderMyProfile, isThin } from "./profile.js";
 import { initCareer, renderOpportunities } from "./career.js";
 import { initUpdates, renderMilestones } from "./updates.js";
 import { initConferences, renderEvents, renderPhotos, renderFeedback } from "./conferences.js";
@@ -231,13 +231,18 @@ function enterShell({ forceAdmin = false } = {}) {
 
   paintIdentity();
   if (PREVIEW) renderAll(); else startData();
-  showTab(location.hash.replace("#", "") || "directory");
+  showTab(location.hash.replace("#", "") || (isThin(state.profile) ? "profile" : "directory"));
   if (!PREVIEW) setPresenceOnline();
 
-  // First visit: open the profile editor if there is nothing on the profile yet.
-  if (!PREVIEW && !state.profile.headshotUrl && !state.profile.bio && !state.profile.title && !sessionStorage.getItem("hpair:nudged")) {
-    sessionStorage.setItem("hpair:nudged", "1");
-    setTimeout(() => { if (state.user) openProfileModal(); }, 600);
+  // First sign-in on this browser, and only then: open the editor once so a
+  // new member starts with something in the directory. Keyed by uid in
+  // localStorage, so it does not reappear on the next visit or the next tab.
+  const setupKey = `hpair:setup:${state.user.uid}`;
+  let seenSetup = true;
+  try { seenSetup = Boolean(localStorage.getItem(setupKey)); } catch {}
+  if (!PREVIEW && !seenSetup && isThin(state.profile)) {
+    try { localStorage.setItem(setupKey, "1"); } catch {}
+    setTimeout(() => { if (state.user) openProfileModal(); }, 500);
   }
 }
 
@@ -276,15 +281,21 @@ function paintIdentity() {
   $("user-email").textContent = me.email;
 }
 
-on("profile:saved", () => { paintIdentity(); setPresenceOnline(); renderDirectory(); });
+on("profile:saved", () => { paintIdentity(); setPresenceOnline(); renderDirectory(); renderMyProfile(); });
+$("profile-edit-btn").addEventListener("click", openProfileModal);
+// "Add them" inside the missing-fields note, wherever it is rendered.
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-edit-profile]")) openProfileModal();
+});
 $("menu-profile").addEventListener("click", openProfileModal);
-$("menu-view-me").addEventListener("click", () => { showTab("directory"); openPerson(state.user.uid); });
+$("menu-view-me").addEventListener("click", () => showTab("profile"));
 
 /* --- tabs --- */
-const TABS = ["directory", "career", "updates", "conferences", "ambassador", "admin"];
+const TABS = ["profile", "directory", "career", "updates", "conferences", "ambassador", "admin"];
 function showTab(name) {
   if (!TABS.includes(name) || (name === "admin" && !state.isAdmin)) name = "directory";
   state.tab = name;
+  if (name === "profile") renderMyProfile();
   $$(".tab-btn").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
   $$(".tab-panel").forEach((p) => { p.hidden = p.id !== `tab-${name}`; });
   history.replaceState(null, "", `#${name}`);
@@ -317,7 +328,7 @@ function startData() {
   const adminRefresh = () => { if (state.isAdmin && state.tab === "admin") renderAdmin(); };
   unsubs.push(
     Users.onChange(() => {
-      renderDirectory(); renderOnline();
+      renderDirectory(); renderOnline(); renderMyProfile();
       $("count-alumni").textContent = Users.items.length ? String(Users.items.length) : "";
       adminRefresh();
     }),
